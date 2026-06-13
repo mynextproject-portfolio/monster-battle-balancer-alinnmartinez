@@ -6,6 +6,7 @@ from ui_constants import (
     BUTTON_HEIGHT_MD, BUTTON_WIDTH_MD,
     TEXT_SIZE_MD, TEXT_SIZE_LG, TEXT_SIZE_XL,
 )
+from language_config import t
 
 
 def cards_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_back):
@@ -28,11 +29,11 @@ def cards_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_bac
                 ft.Container(height=SPACING_XL),
                 ft.Icon(ft.Icons.ERROR_OUTLINE, size=80, color=ft.Colors.RED_400),
                 ft.Container(height=SPACING_LG),
-                ft.Text("Failed to load monster information", size=TEXT_SIZE_XL, color=ft.Colors.RED_400),
-                ft.Text("Please check your internet connection", size=TEXT_SIZE_LG, color=ft.Colors.GREY_400),
+                ft.Text(t("cards_error_loading"), size=TEXT_SIZE_XL, color=ft.Colors.RED_400),
+                ft.Text(t("cards_error_connection"), size=TEXT_SIZE_LG, color=ft.Colors.GREY_400),
                 ft.Container(height=SPACING_XL),
                 ft.ElevatedButton(
-                    "← Back",
+                    t("cards_back_button"),
                     on_click=on_back,
                     width=BUTTON_WIDTH_MD,
                     height=BUTTON_HEIGHT_MD,
@@ -74,13 +75,13 @@ def cards_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_bac
                                     weight=ft.FontWeight.BOLD,
                                 ),
                                 ft.Text(
-                                    f"Defense (AC): {monster.ac}",
+                                    f"{t('cards_defense')}{monster.ac}",
                                     size=TEXT_SIZE_MD,
                                     color=ft.Colors.BLUE_300,
                                     weight=ft.FontWeight.BOLD,
                                 ),
                                 ft.Text(
-                                    f"Strength (STR): {monster.strength}",
+                                    f"{t('cards_strength')}{monster.strength}",
                                     size=TEXT_SIZE_MD,
                                     color=ft.Colors.ORANGE_300,
                                     weight=ft.FontWeight.BOLD,
@@ -115,10 +116,10 @@ def cards_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_bac
                             icon=ft.Icons.ARROW_BACK,
                             icon_color=ft.Colors.WHITE,
                             on_click=on_back,
-                            tooltip="Back to monster selection",
+                            tooltip=t("cards_tooltip_back"),
                         ),
                         ft.Text(
-                            "Monster Cards",
+                            t("cards_title"),
                             size=28,
                             weight=ft.FontWeight.BOLD,
                             color=ft.Colors.WHITE,

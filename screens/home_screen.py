@@ -4,6 +4,7 @@ from ui_constants import (
     BUTTON_HEIGHT_LG, BUTTON_WIDTH_LG,
     TEXT_SIZE_LG, TEXT_SIZE_XL
 )
+from language_config import t
 
 
 def home_screen(page: ft.Page, on_start):
@@ -24,7 +25,7 @@ def home_screen(page: ft.Page, on_start):
                 ),
                 ft.Container(height=SPACING_LG),
                 ft.Text(
-                    "Monster Battle",
+                    t("home_title"),
                     size=48,
                     weight=ft.FontWeight.BOLD,
                     color=ft.Colors.RED_400,
@@ -32,7 +33,7 @@ def home_screen(page: ft.Page, on_start):
                 ),
                 ft.Container(height=SPACING_SM),
                 ft.Text(
-                    "D&D Monster Viewer",
+                    t("home_subtitle"),
                     size=TEXT_SIZE_LG,
                     color=ft.Colors.RED_300,
                     text_align=ft.TextAlign.CENTER,
@@ -41,7 +42,7 @@ def home_screen(page: ft.Page, on_start):
                 ft.Container(height=SPACING_XL),
                 ft.Container(
                     content=ft.Text(
-                        "Select 2 monsters and compare their stat cards",
+                        t("home_description"),
                         size=TEXT_SIZE_XL,
                         color=ft.Colors.GREY_400,
                         text_align=ft.TextAlign.CENTER,
@@ -50,7 +51,7 @@ def home_screen(page: ft.Page, on_start):
                 ),
                 ft.Container(height=SPACING_XL * 2),
                 ft.ElevatedButton(
-                    "View Monsters",
+                    t("home_button"),
                     width=BUTTON_WIDTH_LG,
                     height=BUTTON_HEIGHT_LG,
                     on_click=on_start,

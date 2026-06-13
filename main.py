@@ -3,6 +3,8 @@ import flet as ft
 from screens.home_screen import home_screen
 from screens.monster_selection_screen import monster_selection_screen
 from screens.cards_screen import cards_screen
+from screens.language_selection_screen import language_selection_screen
+from language_config import set_language
 
 
 def main(page: ft.Page):
@@ -21,6 +23,17 @@ def main(page: ft.Page):
     page.window.maximizable = True
     
     # Navigation functions
+    def navigate_to_language_selection(e=None):
+        """Navigate to the language selection screen."""
+        page.clean()
+        page.add(language_selection_screen(page, navigate_to_home_with_language))
+        page.update()
+    
+    def navigate_to_home_with_language(language_code: str):
+        """Set language and navigate to home screen."""
+        set_language(language_code)
+        navigate_to_home()
+    
     def navigate_to_home(e=None):
         """Navigate to the home screen."""
         page.clean()
@@ -39,8 +52,8 @@ def main(page: ft.Page):
         page.add(cards_screen(page, monster1_index, monster2_index, navigate_to_monster_selection))
         page.update()
     
-    # Start with home screen
-    navigate_to_home()
+    # Start with language selection screen
+    navigate_to_language_selection()
 
 
 # Local development opens a native desktop window.

@@ -99,6 +99,64 @@ class TestMonsterCreationFromAPI:
 
 
 @pytest.mark.integration
+class TestMonsterAttacksFromAPI:
+    """Test attack parsing from real API data."""
+
+    def test_goblin_has_attack(self):
+        """Test that Goblin from API has parseable attack."""
+        goblin = get_monster_details('goblin')
+
+        assert goblin is not None
+        assert goblin.attack is not None
+        assert goblin.attack.to_hit_bonus == 4
+        # Goblin's scimitar is 1d6+2
+        assert "1d6" in goblin.attack.damage_dice
+        assert "+2" in goblin.attack.damage_dice
+
+    def test_ancient_dragon_skips_multiattack(self):
+        """Test that Ancient Red Dragon attack skips Multiattack action."""
+        dragon = get_monster_details('ancient-red-dragon')
+
+        assert dragon is not None
+        # Should parse an attack (Bite, skipping Multiattack)
+        assert dragon.attack is not None
+        # Dragon's bite has very high to-hit bonus
+        assert dragon.attack.to_hit_bonus >= 15
+        # Should have meaningful damage
+        assert "d" in dragon.attack.damage_dice.lower()
+
+    def test_commoner_has_attack(self):
+        """Test that Commoner from API has a club attack."""
+        commoner = get_monster_details('commoner')
+
+        assert commoner is not None
+        # Commoners actually have a club attack in the API
+        assert commoner.attack is not None
+        assert commoner.attack.to_hit_bonus == 2
+        assert "1d4" in commoner.attack.damage_dice
+
+    def test_various_monsters_have_parseable_attacks(self):
+        """Test that various monsters can parse attacks without errors."""
+        # Test a variety of monsters
+        monster_indices = ['kobold', 'orc', 'wolf']
+
+        for index in monster_indices:
+            monster = get_monster_details(index)
+            assert monster is not None
+            
+            # Even if attack is None, it should parse without error
+            attack = monster.attack
+            
+            # If attack exists, it should have valid data
+            if attack is not None:
+                assert attack.to_hit_bonus is not None
+                assert isinstance(attack.to_hit_bonus, int)
+                assert attack.damage_dice is not None
+                assert isinstance(attack.damage_dice, str)
+                assert "d" in attack.damage_dice.lower()
+
+
+@pytest.mark.integration
 class TestAPIErrorHandling:
     """Test how the system handles API errors."""
     

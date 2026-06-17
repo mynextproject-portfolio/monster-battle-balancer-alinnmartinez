@@ -57,6 +57,14 @@ TRANSLATIONS = {
         "cards_strength": "筋力 (STR): ",
         "cards_tooltip_back": "モンスター選択にもどる",
         "cards_title": "モンスターカード",
+        "cards_battle_button": "⚔️ バトル開始！",
+
+        # battle_screen.py
+        "battle_title": "バトル",
+        "battle_winner_label": "勝者！",
+        "battle_again_button": "🔄 もう一度",
+        "battle_back_button": "← もどる",
+        "battle_tooltip_back": "カード画面にもどる",
     },
     "en": {
         # main.py
@@ -90,6 +98,14 @@ TRANSLATIONS = {
         "cards_strength": "Strength (STR): ",
         "cards_tooltip_back": "Back to monster selection",
         "cards_title": "Monster Cards",
+        "cards_battle_button": "⚔️ Start Battle!",
+
+        # battle_screen.py
+        "battle_title": "Battle",
+        "battle_winner_label": "Winner!",
+        "battle_again_button": "🔄 Fight Again",
+        "battle_back_button": "← Back",
+        "battle_tooltip_back": "Back to cards",
     }
 }
 

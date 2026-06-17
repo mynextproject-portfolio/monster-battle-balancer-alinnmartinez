@@ -1,7 +1,7 @@
 import flet as ft
 from dnd_api import get_monster_details
 from models.monster import Monster
-from battle import simulate_battle, win_rates
+from battle import simulate_battle, win_rates, is_competitive
 from ui_constants import (
     SPACING_XS, SPACING_SM, SPACING_LG, SPACING_XL,
     BUTTON_HEIGHT_MD, BUTTON_WIDTH_MD,
@@ -46,6 +46,7 @@ def battle_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_ba
     winner = simulate_battle(monster1, monster2)
     m1_wins = winner is monster1
     m1_rate, m2_rate = win_rates(monster1, monster2)
+    competitive = is_competitive(m1_rate, m2_rate)
 
     def create_monster_card(monster: Monster, color: str, is_winner: bool) -> ft.Container:
         crown = ft.Text("👑", size=36, text_align=ft.TextAlign.CENTER) if is_winner else ft.Container(height=36)
@@ -196,6 +197,20 @@ def battle_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_ba
                 ),
                 ft.Container(height=SPACING_SM),
                 win_rate_bar(),
+                ft.Container(height=SPACING_SM),
+                # Competitive verdict badge
+                ft.Container(
+                    content=ft.Text(
+                        t("battle_verdict_fun") if competitive else t("battle_verdict_boring"),
+                        size=TEXT_SIZE_LG,
+                        weight=ft.FontWeight.BOLD,
+                        color=ft.Colors.WHITE,
+                        text_align=ft.TextAlign.CENTER,
+                    ),
+                    padding=ft.padding.symmetric(horizontal=SPACING_LG, vertical=SPACING_XS),
+                    bgcolor=ft.Colors.GREEN_700 if competitive else ft.Colors.GREY_700,
+                    border_radius=20,
+                ),
                 ft.Container(height=SPACING_SM),
                 # Winner banner
                 ft.Container(

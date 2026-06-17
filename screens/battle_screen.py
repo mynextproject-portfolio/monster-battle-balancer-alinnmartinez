@@ -1,4 +1,3 @@
-# battle screen
 import flet as ft
 from dnd_api import get_monster_details
 from models.monster import Monster

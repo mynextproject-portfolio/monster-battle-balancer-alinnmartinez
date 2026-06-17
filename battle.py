@@ -103,6 +103,27 @@ def win_rates(
     return m1_wins / n, (n - m1_wins) / n
 
 
+def is_competitive(m1_rate: float, m2_rate: float, threshold: float = 0.20) -> bool:
+    """Return True if the matchup is genuinely up for grabs.
+
+    A fight is competitive when the underdog still has a real shot — defined
+    as a win rate at or above `threshold`. Below that, the outcome feels
+    inevitable and the matchup is considered a stomp.
+
+    The default threshold of 0.20 reflects the agreed rule: if one side wins
+    more than four times out of five, it is no longer a real contest.
+
+    Args:
+        m1_rate: Monster 1 win rate in [0.0, 1.0].
+        m2_rate: Monster 2 win rate in [0.0, 1.0].
+        threshold: Minimum win rate the underdog must have. Defaults to 0.20.
+
+    Returns:
+        True if both monsters have a real shot; False if it is a blowout.
+    """
+    return min(m1_rate, m2_rate) >= threshold
+
+
 def _stat_winner(monster1: Monster, monster2: Monster) -> Monster:
     """Break a tie using HP then strength, defaulting to monster1."""
     if monster1.hp > monster2.hp:

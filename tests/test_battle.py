@@ -2,7 +2,7 @@
 
 import pytest
 from models.monster import Monster
-from battle import simulate_battle, win_rates, _parse_damage_dice
+from battle import simulate_battle, win_rates, is_competitive, _parse_damage_dice
 
 
 # ---------------------------------------------------------------------------
@@ -207,3 +207,36 @@ class TestWinRates:
         r_strong, r_weak = win_rates(strong, weak, n=50)
         assert r_strong == 1.0
         assert r_weak == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Competitive verdict (fun vs boring threshold)
+# ---------------------------------------------------------------------------
+
+class TestIsCompetitive:
+    def test_perfect_50_50_is_competitive(self):
+        assert is_competitive(0.50, 0.50) is True
+
+    def test_exactly_at_threshold_is_competitive(self):
+        # 0.20 is the agreed minimum — must be included
+        assert is_competitive(0.20, 0.80) is True
+
+    def test_just_below_threshold_is_not_competitive(self):
+        assert is_competitive(0.19, 0.81) is False
+
+    def test_shutout_is_not_competitive(self):
+        assert is_competitive(0.0, 1.0) is False
+
+    def test_comfortable_underdog_is_competitive(self):
+        assert is_competitive(0.35, 0.65) is True
+
+    def test_custom_threshold_respected(self):
+        # With a stricter threshold, 25% underdog is a stomp
+        assert is_competitive(0.25, 0.75, threshold=0.30) is False
+
+    def test_custom_threshold_passes_when_above(self):
+        assert is_competitive(0.35, 0.65, threshold=0.30) is True
+
+    def test_symmetry(self):
+        # Order of arguments should not matter
+        assert is_competitive(0.30, 0.70) == is_competitive(0.70, 0.30)

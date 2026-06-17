@@ -62,6 +62,7 @@ TRANSLATIONS = {
         # battle_screen.py
         "battle_title": "バトル",
         "battle_winner_label": "勝者！",
+        "battle_win_rate_label": "勝率",
         "battle_again_button": "🔄 もう一度",
         "battle_back_button": "← もどる",
         "battle_tooltip_back": "カード画面にもどる",
@@ -103,6 +104,7 @@ TRANSLATIONS = {
         # battle_screen.py
         "battle_title": "Battle",
         "battle_winner_label": "Winner!",
+        "battle_win_rate_label": "Win Rate",
         "battle_again_button": "🔄 Fight Again",
         "battle_back_button": "← Back",
         "battle_tooltip_back": "Back to cards",

@@ -77,6 +77,32 @@ def simulate_battle(monster1: Monster, monster2: Monster, seed=None) -> Monster:
     return _stat_winner(monster1, monster2)
 
 
+def win_rates(
+    monster1: Monster, monster2: Monster, n: int = 1000, seed: int = 0
+) -> tuple[float, float]:
+    """Return (m1_rate, m2_rate) estimated from n simulated battles.
+
+    Both values are in [0.0, 1.0] and sum to 1.0. Uses a fixed seed so the
+    same matchup always produces the same percentages — pass a different seed
+    if you want a fresh estimate.
+
+    Args:
+        monster1: First combatant.
+        monster2: Second combatant.
+        n: Number of simulations. Higher values give more stable percentages.
+        seed: Master seed used to derive per-battle seeds reproducibly.
+
+    Returns:
+        Tuple (monster1_win_rate, monster2_win_rate).
+    """
+    rng = random.Random(seed)
+    m1_wins = sum(
+        1 for _ in range(n)
+        if simulate_battle(monster1, monster2, seed=rng.randint(0, 2**32)) is monster1
+    )
+    return m1_wins / n, (n - m1_wins) / n
+
+
 def _stat_winner(monster1: Monster, monster2: Monster) -> Monster:
     """Break a tie using HP then strength, defaulting to monster1."""
     if monster1.hp > monster2.hp:

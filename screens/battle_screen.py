@@ -1,7 +1,7 @@
 import flet as ft
 from dnd_api import get_monster_details
 from models.monster import Monster
-from battle import simulate_battle
+from battle import simulate_battle, win_rates
 from ui_constants import (
     SPACING_XS, SPACING_SM, SPACING_LG, SPACING_XL,
     BUTTON_HEIGHT_MD, BUTTON_WIDTH_MD,
@@ -45,6 +45,7 @@ def battle_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_ba
 
     winner = simulate_battle(monster1, monster2)
     m1_wins = winner is monster1
+    m1_rate, m2_rate = win_rates(monster1, monster2)
 
     def create_monster_card(monster: Monster, color: str, is_winner: bool) -> ft.Container:
         crown = ft.Text("👑", size=36, text_align=ft.TextAlign.CENTER) if is_winner else ft.Container(height=36)
@@ -94,6 +95,66 @@ def battle_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_ba
             opacity=1.0 if is_winner else 0.45,
         )
 
+    def win_rate_bar() -> ft.Column:
+        """Split bar showing each monster's simulated win percentage."""
+        BAR_WIDTH = 720
+        BAR_HEIGHT = 40
+        # Guarantee at least 8px per side so the layout never collapses.
+        m1_px = max(int(BAR_WIDTH * m1_rate), 8)
+        m2_px = max(BAR_WIDTH - m1_px, 8)
+        m1_px = BAR_WIDTH - m2_px  # re-sync after clamping m2
+
+        return ft.Column(
+            [
+                ft.Text(
+                    t("battle_win_rate_label"),
+                    size=TEXT_SIZE_MD,
+                    color=ft.Colors.GREY_400,
+                    text_align=ft.TextAlign.CENTER,
+                ),
+                ft.Row(
+                    [
+                        ft.Container(
+                            content=ft.Text(
+                                f"{m1_rate:.0%}",
+                                color=ft.Colors.WHITE,
+                                weight=ft.FontWeight.BOLD,
+                                size=TEXT_SIZE_LG,
+                                no_wrap=True,
+                            ),
+                            width=m1_px,
+                            height=BAR_HEIGHT,
+                            bgcolor=ft.Colors.AMBER_800,
+                            border_radius=ft.border_radius.only(top_left=6, bottom_left=6),
+                            padding=ft.padding.symmetric(horizontal=10),
+                            alignment=ft.alignment.center_left,
+                            clip_behavior=ft.ClipBehavior.HARD_EDGE,
+                        ),
+                        ft.Container(
+                            content=ft.Text(
+                                f"{m2_rate:.0%}",
+                                color=ft.Colors.WHITE,
+                                weight=ft.FontWeight.BOLD,
+                                size=TEXT_SIZE_LG,
+                                no_wrap=True,
+                            ),
+                            width=m2_px,
+                            height=BAR_HEIGHT,
+                            bgcolor=ft.Colors.BLUE_800,
+                            border_radius=ft.border_radius.only(top_right=6, bottom_right=6),
+                            padding=ft.padding.symmetric(horizontal=10),
+                            alignment=ft.alignment.center_right,
+                            clip_behavior=ft.ClipBehavior.HARD_EDGE,
+                        ),
+                    ],
+                    spacing=0,
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+            ],
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=SPACING_XS,
+        )
+
     return ft.Container(
         content=ft.Column(
             [
@@ -133,7 +194,9 @@ def battle_screen(page: ft.Page, monster1_index: str, monster2_index: str, on_ba
                     spacing=SPACING_LG,
                     scroll=ft.ScrollMode.AUTO,
                 ),
-                ft.Container(height=SPACING_LG),
+                ft.Container(height=SPACING_SM),
+                win_rate_bar(),
+                ft.Container(height=SPACING_SM),
                 # Winner banner
                 ft.Container(
                     content=ft.Column(

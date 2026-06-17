@@ -2,7 +2,7 @@
 
 import pytest
 from models.monster import Monster
-from battle import simulate_battle, _parse_damage_dice
+from battle import simulate_battle, win_rates, _parse_damage_dice
 
 
 # ---------------------------------------------------------------------------
@@ -152,3 +152,58 @@ class TestBattleUsesStats:
         m2 = make_monster("Rogue", hp=16, ac=13, strength=10, attack_bonus=4, damage_dice="1d6+2")
         results = [simulate_battle(m1, m2, seed=7) for _ in range(5)]
         assert len(set(id(r) for r in results)) == 1  # always the same object
+
+
+# ---------------------------------------------------------------------------
+# Win rates (Monte Carlo)
+# ---------------------------------------------------------------------------
+
+class TestWinRates:
+    def test_rates_sum_to_one(self):
+        m1 = make_monster("A", hp=10, ac=12, strength=10, attack_bonus=3, damage_dice="1d6")
+        m2 = make_monster("B", hp=10, ac=12, strength=10, attack_bonus=3, damage_dice="1d6")
+        r1, r2 = win_rates(m1, m2)
+        assert abs(r1 + r2 - 1.0) < 1e-9
+
+    def test_rates_are_in_range(self):
+        m1 = make_monster("A", hp=10, ac=12, strength=10, attack_bonus=3, damage_dice="1d6")
+        m2 = make_monster("B", hp=8, ac=10, strength=8, attack_bonus=2, damage_dice="1d4")
+        r1, r2 = win_rates(m1, m2)
+        assert 0.0 <= r1 <= 1.0
+        assert 0.0 <= r2 <= 1.0
+
+    def test_same_seed_reproducible(self):
+        m1 = make_monster("A", hp=10, ac=12, strength=10, attack_bonus=3, damage_dice="1d6")
+        m2 = make_monster("B", hp=10, ac=12, strength=10, attack_bonus=3, damage_dice="1d6")
+        assert win_rates(m1, m2, seed=7) == win_rates(m1, m2, seed=7)
+
+    def test_dominant_monster_wins_majority(self):
+        """Tank with overwhelming HP and AC should win >80% of the time."""
+        tank = make_monster("Tank", hp=200, ac=18, strength=20, attack_bonus=8, damage_dice="1d10+5")
+        weak = make_monster("Weak", hp=5, ac=10, strength=8, attack_bonus=0, damage_dice="1d4")
+        r_tank, r_weak = win_rates(tank, weak, n=200)
+        assert r_tank > 0.8
+
+    def test_invincible_monster_wins_all(self):
+        """AC 30 is unhittable — win rate should be 100%."""
+        god = make_monster("God", hp=50, ac=30, strength=10, attack_bonus=5, damage_dice="1d6")
+        mortal = make_monster("Mortal", hp=50, ac=10, strength=10, attack_bonus=0, damage_dice="1d4")
+        r_god, r_mortal = win_rates(god, mortal, n=100)
+        assert r_god == 1.0
+        assert r_mortal == 0.0
+
+    def test_n_controls_sample_size(self):
+        """Larger n should produce a more stable estimate (lower variance)."""
+        m1 = make_monster("A", hp=10, ac=12, strength=10, attack_bonus=3, damage_dice="1d6")
+        m2 = make_monster("B", hp=10, ac=12, strength=10, attack_bonus=3, damage_dice="1d6")
+        # With n=1000 default, estimate should be within 10% of 50%
+        r1, _ = win_rates(m1, m2, n=1000)
+        assert 0.40 <= r1 <= 0.60
+
+    def test_both_no_attack_consistent_result(self):
+        """No-attack monsters always resolve the same way — rate should be 0% or 100%."""
+        strong = make_monster("Strong", hp=10, ac=10, strength=16)
+        weak = make_monster("Weak", hp=5, ac=10, strength=8)
+        r_strong, r_weak = win_rates(strong, weak, n=50)
+        assert r_strong == 1.0
+        assert r_weak == 0.0
